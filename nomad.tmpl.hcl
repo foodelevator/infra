@@ -21,6 +21,10 @@ client {
   host_volume "ca-certificates" {
     path = "/var/local/ca-certificates"
   }
+
+  host_volume "static-files" {
+    path = "/var/www/files"
+  }
 }
 
 acl {
