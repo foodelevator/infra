@@ -20,20 +20,26 @@ job "certificates" {
       }
 
       config {
-        command = "lego"
-        args = [
-          "--accept-tos",
-          "--path", "/lego",
-          "--email", "mathias+certs@magnusson.space",
-          "--dns", "cloudflare",
-          "-d", "magnusson.space", "-d", "*.magnusson.space",
-          "-d", "magnusson.wiki", "-d", "*.magnusson.wiki",
-          "run"
-        ]
+        command = "certs.sh"
       }
 
-      artifact {
-        source = "https://github.com/go-acme/lego/releases/download/v4.13.3/lego_v4.13.3_linux_amd64.tar.gz"
+      template {
+        data = <<EOF
+#!/usr/bin/env bash
+function dns() {
+    /local/lego \
+        --accept-tos \
+        --path /lego \
+        --email mathias+certs@magnusson.space \
+        --dns cloudflare \
+        $@ \
+        run
+}
+dns -d magnusson.space -d *.magnusson.space
+dns -d magnusson.wiki -d *.magnusson.wiki
+# dns -d xn--srskildakommandorrelsegruppen-0pc88c.se -d *.xn--srskildakommandorrelsegruppen-0pc88c.se
+EOF
+        destination = "local/certs.sh"
       }
 
       template {
@@ -44,6 +50,10 @@ CLOUDFLARE_DNS_API_TOKEN={{ .cloudflare_dns_api_token }}
 EOF
         destination = "local/.env"
         env         = true
+      }
+
+      artifact {
+        source = "https://github.com/go-acme/lego/releases/download/v4.13.3/lego_v4.13.3_linux_amd64.tar.gz"
       }
     }
   }
