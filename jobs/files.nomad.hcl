@@ -18,8 +18,8 @@ job "files" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=files.magnusson.wiki",
-        "nginx.certname=magnusson.wiki",
+        "nginx.hostname=files.magnusson.space",
+        "nginx.certname=magnusson.space",
       ]
     }
 

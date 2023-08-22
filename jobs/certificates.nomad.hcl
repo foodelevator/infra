@@ -26,6 +26,7 @@ job "certificates" {
           "--path", "/lego",
           "--email", "mathias+certs@magnusson.space",
           "--dns", "cloudflare",
+          "-d", "magnusson.space", "-d", "*.magnusson.space",
           "-d", "magnusson.wiki", "-d", "*.magnusson.wiki",
           "run"
         ]

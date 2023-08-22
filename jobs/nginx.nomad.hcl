@@ -39,12 +39,16 @@ job "virtual-hosting" {
 {{- range nomadServices -}}
   {{- $hostname := "" -}}
   {{- $certname := "" -}}
+  {{- $default := "" -}}
   {{- range $tag := .Tags -}}
     {{- if $tag | regexMatch "nginx.hostname=" -}}
       {{- $hostname = $tag | replaceAll "nginx.hostname=" "" -}}
     {{- end -}}
     {{- if $tag | regexMatch "nginx.certname=" -}}
       {{- $certname = $tag | replaceAll "nginx.certname=" "" -}}
+    {{- end -}}
+    {{- if $tag | regexMatch "nginx.default_server" -}}
+      {{- $default = "default_server" -}}
     {{- end -}}
   {{- end -}}
   {{- if eq $hostname "" -}}
@@ -61,8 +65,8 @@ upstream {{ $upstream }} {
 }
 
 server {
-  listen 80;
-  listen [::]:80;
+  listen 80 {{ $default }};
+  listen [::]:80 {{ $default }};
   http2 on;
   server_name {{ $hostname }};
 
@@ -80,8 +84,8 @@ server {
 
 {{ if ne $certname "" -}}
 server {
-  listen 443 ssl;
-  listen [::]:443 ssl;
+  listen 443 ssl {{ $default }};
+  listen [::]:443 ssl {{ $default }};
   http2 on;
   server_name {{ $hostname }};
 
