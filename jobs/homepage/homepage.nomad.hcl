@@ -58,11 +58,6 @@ EOF
         data = file("jobs/homepage/index.html")
         destination = "local/html/index.html"
       }
-
-      artifact {
-        source = "https://files.magnusson.space/images/epost.png"
-        destination = "local/html/"
-      }
     }
   }
 }
