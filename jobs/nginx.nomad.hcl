@@ -20,6 +20,11 @@ job "virtual-hosting" {
     task "nginx" {
       driver = "docker"
 
+      resources {
+        cpu    = 50
+        memory = 20
+      }
+
       volume_mount {
         volume      = "certs"
         destination = "/var/local/certs"

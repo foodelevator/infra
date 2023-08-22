@@ -23,6 +23,11 @@ job "homepage" {
     task "web" {
       driver = "docker"
 
+      resources {
+        cpu    = 50
+        memory = 20
+      }
+
       config {
         image = "nginx:1.25-alpine"
         ports = ["http"]

@@ -26,6 +26,11 @@ job "files" {
     task "web" {
       driver = "docker"
 
+      resources {
+        cpu    = 50
+        memory = 20
+      }
+
       volume_mount {
         volume      = "files"
         destination = "/var/www"
