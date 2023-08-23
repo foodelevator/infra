@@ -25,6 +25,10 @@ client {
   host_volume "static-files" {
     path = "/var/www/files"
   }
+
+  host_volume "faktura-settings" {
+    path = "/var/www/faktura"
+  }
 }
 
 acl {
