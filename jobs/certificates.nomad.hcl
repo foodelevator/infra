@@ -6,6 +6,11 @@ job "certificates" {
   }
 
   group "lego" {
+    restart {
+      attempts = 1
+      delay    = "1h"
+    }
+
     volume "certs" {
       type   = "host"
       source = "ca-certificates"
@@ -27,17 +32,18 @@ job "certificates" {
         data = <<EOF
 #!/usr/bin/env bash
 function dns() {
+    [ -f "/lego/certificates/$1.key" ] && cmd="renew --days 45" || cmd=run
     /local/lego \
         --accept-tos \
         --path /lego \
         --email mathias+certs@magnusson.space \
         --dns cloudflare \
-        $@ \
-        run
+        $${@/#/-d=} \
+        $cmd
 }
-dns -d magnusson.space -d *.magnusson.space
-dns -d magnusson.wiki -d *.magnusson.wiki
-# dns -d xn--srskildakommandorrelsegruppen-0pc88c.se -d *.xn--srskildakommandorrelsegruppen-0pc88c.se
+dns magnusson.space *.magnusson.space
+dns magnusson.wiki *.magnusson.wiki
+dns xn--srskildakommandorrelsegruppen-0pc88c.se *.xn--srskildakommandorrelsegruppen-0pc88c.se
 EOF
         destination = "local/certs.sh"
       }
