@@ -1,4 +1,4 @@
-job "keys" {
+job "sh" {
   group "web" {
     network {
       port "http" {
@@ -7,12 +7,12 @@ job "keys" {
     }
 
     service {
-      name     = "keys"
+      name     = "sh"
       port     = "http"
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=keys.magnusson.space",
+        "nginx.hostname=sh.magnusson.space",
         "nginx.certname=magnusson.space",
       ]
     }
@@ -53,7 +53,10 @@ EOF
 
       template {
         data = <<EOF
-ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEdUe7mxGdV/Q37RKndPzDHisFb7q/xm+L97jcGluSDOA8MGt/+wTxpyGxfyEqaMvwV2bakaMVHTB3711dDu5kE=
+echo "ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBEdUe7mxGdV/Q37RKndPzDHisFb7q/xm+L97jcGluSDOA8MGt/+wTxpyGxfyEqaMvwV2bakaMVHTB3711dDu5kE=" >> ~/.ssh/authorized_keys
+systemctl enable ssh
+systemctl enable sshd
+command -v curl >/dev/null && curl sh.magnusson.space/hello || command -v wget >/dev/null && wget sh.magnusson.space/hello -O /dev/null
 EOF
         destination = "local/www/index.txt"
       }
