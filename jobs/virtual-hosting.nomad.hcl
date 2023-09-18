@@ -42,25 +42,26 @@ job "virtual-hosting" {
       template {
         data = <<EOF
 {{- range nomadServices -}}
-  {{- $hostname := "" -}}
-  {{- $certname := "" -}}
-  {{- $default := "" -}}
-  {{- range $tag := .Tags -}}
-    {{- if $tag | regexMatch "nginx.hostname=" -}}
-      {{- $hostname = $tag | replaceAll "nginx.hostname=" "" -}}
-    {{- end -}}
-    {{- if $tag | regexMatch "nginx.certname=" -}}
-      {{- $certname = $tag | replaceAll "nginx.certname=" "" -}}
-    {{- end -}}
-    {{- if $tag | regexMatch "nginx.default_server" -}}
-      {{- $default = "default_server" -}}
-    {{- end -}}
-  {{- end -}}
-  {{- if eq $hostname "" -}}
-    {{- continue -}}
-  {{- end -}}
 
-  {{- $upstream := .Name | toLower | regexReplaceAll "[^a-z0-9\\-._]" "" -}}
+{{- $hostname := "" -}}
+{{- $certname := "" -}}
+{{- $default := "" -}}
+{{- range $tag := .Tags -}}
+  {{- if $tag | regexMatch "nginx.hostname=" -}}
+    {{- $hostname = $tag | replaceAll "nginx.hostname=" "" -}}
+  {{- end -}}
+  {{- if $tag | regexMatch "nginx.certname=" -}}
+    {{- $certname = $tag | replaceAll "nginx.certname=" "" -}}
+  {{- end -}}
+  {{- if $tag | regexMatch "nginx.default_server" -}}
+    {{- $default = "default_server" -}}
+  {{- end -}}
+{{- end -}}
+{{- if eq $hostname "" -}}
+  {{- continue -}}
+{{- end -}}
+
+{{- $upstream := .Name | toLower | regexReplaceAll "[^a-z0-9\\-._]" "" -}}
 
 ################################################
 upstream {{ $upstream }} {
