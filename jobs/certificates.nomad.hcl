@@ -16,6 +16,20 @@ job "certificates" {
       source = "ca-certificates"
     }
 
+    network {
+      port "http" { }
+    }
+
+    service {
+      name     = "certificates"
+      port     = "http"
+      provider = "nomad"
+
+      tags = [
+        "nginx.hijack_http=.dinlugnastund.se",
+      ]
+    }
+
     task "lego" {
       driver = "exec"
 
@@ -31,6 +45,7 @@ job "certificates" {
       template {
         data = <<EOF
 #!/usr/bin/env bash
+
 function dns() {
     [ -f "/lego/certificates/$1.key" ] && cmd="renew --days 45" || cmd=run
     /local/lego \
@@ -41,9 +56,22 @@ function dns() {
         $${@/#/-d=} \
         $cmd
 }
+
+function http() {
+    [ -f "/lego/certificates/$1.key" ] && cmd="renew --days 45" || cmd=run
+    /local/lego \
+        --accept-tos \
+        --path /lego \
+        --email mathias+certs@magnusson.space \
+        --http --http.port ":$NOMAD_PORT_http" \
+        $${@/#/-d=} \
+        $cmd
+}
+
 dns magnusson.space *.magnusson.space
 dns magnusson.wiki *.magnusson.wiki
 dns xn--srskildakommandorrelsegruppen-0pc88c.se *.xn--srskildakommandorrelsegruppen-0pc88c.se
+http dinlugnastund.se www.dinlugnastund.se
 EOF
         destination = "local/certs.sh"
       }

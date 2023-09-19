@@ -41,6 +41,26 @@ job "virtual-hosting" {
 
       template {
         data = <<EOF
+{{- $hijackHTTPHostnames := sprig_list -}}
+{{- $hijackUpstream := "" -}}
+{{- range $s := nomadServices -}}
+{{- range $tag := $s.Tags -}}
+  {{- if $tag | regexMatch "nginx.hijack_http=" -}}
+    {{- $hijackHTTPHostnames = $tag | replaceAll "nginx.hijack_http=" "" | split "," -}}
+    {{- $hijackUpstream = $s.Name | toLower | regexReplaceAll "[^a-z0-9\\-._]" "" -}}
+upstream {{ $hijackUpstream }} {
+  {{- range nomadService $s.Name }}
+  server {{ .Address }}:{{ .Port }};
+  {{- end }}
+}
+    {{- break -}}
+  {{- end -}}
+  {{- if ne (len $hijackHTTPHostnames) 0 -}}
+    {{- break -}}
+  {{- end -}}
+{{- end -}}
+{{- end }}
+
 {{- range nomadServices -}}
 
 {{- $hostname := "" -}}
@@ -77,8 +97,13 @@ server {
   server_name {{ $hostname }};
 
   location / {
-    proxy_pass http://{{ $upstream }};
+    {{ if $hijackHTTPHostnames | contains $hostname -}}
+      proxy_pass http://{{ $hijackUpstream }};
+    {{- else -}}
+      proxy_pass http://{{ $upstream }};
+    {{- end }}
 
+    proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-Host $host;
     proxy_set_header X-Forwarded-Port $server_port;
