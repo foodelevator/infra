@@ -29,6 +29,10 @@ client {
   host_volume "faktura-settings" {
     path = "/var/www/faktura"
   }
+
+  host_volume "syncthing" {
+    path = "/var/local/syncthing"
+  }
 }
 
 acl {
