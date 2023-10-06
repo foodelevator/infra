@@ -72,6 +72,7 @@ dns magnusson.space *.magnusson.space
 dns magnusson.wiki *.magnusson.wiki
 dns xn--srskildakommandorrelsegruppen-0pc88c.se *.xn--srskildakommandorrelsegruppen-0pc88c.se
 http dinlugnastund.se www.dinlugnastund.se
+CLOUDFLARE_DNS_API_TOKEN=$CTFTAJM_TOKEN dns ctftajm.se *.ctftajm.se
 EOF
         destination = "local/certs.sh"
       }
@@ -80,6 +81,7 @@ EOF
         data = <<EOF
 {{ with nomadVar "nomad/jobs/certificates" }}
 CLOUDFLARE_DNS_API_TOKEN={{ .cloudflare_dns_api_token }}
+CTFTAJM_TOKEN={{ .cloudflare_dns_api_token_ctftajm }}
 {{ end }}
 EOF
         destination = "local/.env"

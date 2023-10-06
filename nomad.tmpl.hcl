@@ -33,6 +33,10 @@ client {
   host_volume "syncthing" {
     path = "/var/local/syncthing"
   }
+
+  host_volume "ctftajm-postgres" {
+    path = "/var/local/ctftajm-postgres"
+  }
 }
 
 acl {
