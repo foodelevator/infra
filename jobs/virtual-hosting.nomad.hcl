@@ -35,10 +35,50 @@ job "virtual-hosting" {
         ports = ["http", "https"]
 
         volumes = [
-          "local:/etc/nginx/conf.d",
+          "local/nginx.conf:/etc/nginx/nginx.conf",
+          "local/virtual-hosting.conf:/etc/nginx/conf.d/virtual-hosting.conf",
         ]
       }
 
+      template {
+        data = <<EOF
+user nginx;
+worker_processes auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server_names_hash_bucket_size 128;
+
+    include /etc/nginx/conf.d/*.conf;
+}
+EOF
+
+        destination   = "local/nginx.conf"
+        change_mode   = "signal"
+        change_signal = "SIGHUP"
+      }
       template {
         data = <<EOF
 {{- $hijackHTTPHostnames := sprig_list -}}
@@ -90,6 +130,7 @@ upstream {{ $upstream }} {
   {{- end }}
 }
 
+{{ if eq $certname "" -}}
 server {
   listen 80 {{ $default }};
   listen [::]:80 {{ $default }};
@@ -113,7 +154,47 @@ server {
   }
 }
 
-{{ if ne $certname "" -}}
+{{ else -}}
+server {
+  listen 80;
+  listen [::]:80;
+  http2 on;
+  server_name http.{{ $hostname | sprig_trimPrefix "." }};
+
+  location / {
+    proxy_pass http://{{ $upstream }};
+
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Port $server_port;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    proxy_set_header Upgrade $http_upgrade;
+  }
+}
+
+server {
+  listen 443 ssl;
+  listen [::]:443 ssl;
+  http2 on;
+  server_name http.{{ $hostname | sprig_trimPrefix "." }};
+
+  ssl_certificate /var/local/certs/certificates/{{ $certname }}.crt;
+  ssl_certificate_key /var/local/certs/certificates/{{ $certname }}.key;
+  ssl_trusted_certificate /var/local/certs/certificates/{{ $certname }}.issuer.crt;
+
+  return 301 http://$host$request_uri;
+}
+
+server {
+  listen 80 {{ $default }};
+  listen [::]:80 {{ $default }};
+  http2 on;
+  server_name {{ $hostname }};
+
+  return 301 https://$host$request_uri;
+}
+
 server {
   listen 443 ssl {{ $default }};
   listen [::]:443 ssl {{ $default }};
