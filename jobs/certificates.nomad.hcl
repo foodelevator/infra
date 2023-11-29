@@ -26,7 +26,7 @@ job "certificates" {
       provider = "nomad"
 
       tags = [
-        "nginx.hijack_http=.dinlugnastund.se",
+        "nginx.acme-challenge",
       ]
     }
 
@@ -47,7 +47,7 @@ job "certificates" {
 #!/usr/bin/env bash
 
 function dns() {
-    [ -f "/lego/certificates/$1.key" ] && cmd="renew --days 45" || cmd=run
+    [ -f "/lego/certificates/$1.key" ] && cmd="renew --no-random-sleep --days 45" || cmd=run
     /local/lego \
         --accept-tos \
         --path /lego \
@@ -58,7 +58,7 @@ function dns() {
 }
 
 function http() {
-    [ -f "/lego/certificates/$1.key" ] && cmd="renew --days 45" || cmd=run
+    [ -f "/lego/certificates/$1.key" ] && cmd="renew --no-random-sleep --days 45" || cmd=run
     /local/lego \
         --accept-tos \
         --path /lego \

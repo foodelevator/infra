@@ -81,27 +81,30 @@ EOF
       }
       template {
         data = <<EOF
-{{- $hijackHTTPHostnames := sprig_list -}}
-{{- $hijackUpstream := "" -}}
+{{- $hijackUpstream := false -}}
 {{- range $s := nomadServices -}}
 {{- range $tag := $s.Tags -}}
-  {{- if $tag | regexMatch "nginx.hijack_http=" -}}
-    {{- $hijackHTTPHostnames = $tag | replaceAll "nginx.hijack_http=" "" | split "," -}}
-    {{- $hijackUpstream = $s.Name | toLower | regexReplaceAll "[^a-z0-9\\-._]" "" -}}
-upstream {{ $hijackUpstream }} {
+  {{- if eq $tag "nginx.acme-challenge" -}}
+    {{- $hijackUpstream = true -}}
+upstream acme-challenge {
   {{- range nomadService $s.Name }}
   server {{ .Address }}:{{ .Port }};
   {{- end }}
 }
     {{- break -}}
   {{- end -}}
-  {{- if ne (len $hijackHTTPHostnames) 0 -}}
+  {{- if $hijackUpstream -}}
     {{- break -}}
   {{- end -}}
 {{- end -}}
 {{- end }}
+{{ if not $hijackUpstream }}
+upstream acme-challenge {
+  server magnusson.space:10101;
+}
+{{ end }}
 
-{{- range nomadServices -}}
+{{ range nomadServices -}}
 
 {{- $hostname := "" -}}
 {{- $certname := "" -}}
@@ -137,12 +140,13 @@ server {
   http2 on;
   server_name {{ $hostname }};
 
+  location /.well-known/acme-challenge {
+    proxy_pass http://acme-challenge;
+    proxy_set_header Host $host;
+  }
+
   location / {
-    {{ if $hijackHTTPHostnames | contains $hostname -}}
-      proxy_pass http://{{ $hijackUpstream }};
-    {{- else -}}
-      proxy_pass http://{{ $upstream }};
-    {{- end }}
+    proxy_pass http://{{ $upstream }};
 
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
@@ -192,6 +196,11 @@ server {
   http2 on;
   server_name {{ $hostname }};
 
+  location /.well-known/acme-challenge {
+    proxy_pass http://acme-challenge;
+    proxy_set_header Host $host;
+  }
+
   return 301 https://$host$request_uri;
 }
 
@@ -204,6 +213,11 @@ server {
   ssl_certificate /var/local/certs/certificates/{{ $certname }}.crt;
   ssl_certificate_key /var/local/certs/certificates/{{ $certname }}.key;
   ssl_trusted_certificate /var/local/certs/certificates/{{ $certname }}.issuer.crt;
+
+  location /.well-known/acme-challenge {
+    proxy_pass http://acme-challenge;
+    proxy_set_header Host $host;
+  }
 
   location / {
     proxy_pass http://{{ $upstream }};
