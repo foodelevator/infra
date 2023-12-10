@@ -71,6 +71,7 @@ function http() {
 dns magnusson.space *.magnusson.space
 dns magnusson.wiki *.magnusson.wiki
 dns xn--srskildakommandorrelsegruppen-0pc88c.se *.xn--srskildakommandorrelsegruppen-0pc88c.se
+dns xn--hvd-sna.ing *.xn--hvd-sna.ing
 http dinlugnastund.se www.dinlugnastund.se
 CLOUDFLARE_DNS_API_TOKEN=$CTFTAJM_TOKEN dns ctftajm.se *.ctftajm.se
 EOF
