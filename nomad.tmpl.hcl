@@ -37,6 +37,10 @@ client {
   host_volume "ctftajm-postgres" {
     path = "/var/local/ctftajm-postgres"
   }
+
+  host_volume "vaultwarden" {
+    path = "/var/local/vaultwarden"
+  }
 }
 
 acl {
