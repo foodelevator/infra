@@ -76,7 +76,6 @@ http {
 EOF
 
         destination   = "local/nginx.conf"
-        change_mode   = "signal"
         change_signal = "SIGHUP"
       }
       template {
@@ -159,6 +158,7 @@ server {
     proxy_set_header X-Forwarded-Port $server_port;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
+    proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
   }
@@ -179,6 +179,7 @@ server {
     proxy_set_header X-Forwarded-Port $server_port;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
+    proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
   }
@@ -234,6 +235,7 @@ server {
     proxy_set_header X-Forwarded-Port $server_port;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 
+    proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
   }
@@ -244,7 +246,6 @@ server {
 EOF
 
         destination   = "local/virtual-hosting.conf"
-        change_mode   = "signal"
         change_signal = "SIGHUP"
       }
     }
