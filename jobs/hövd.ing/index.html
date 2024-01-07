@@ -10,8 +10,11 @@
             box-sizing: border-box;
         }
         body {
-            display: grid;
-            place-items: center;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2em;
             min-height: 100vh;
             font-family: monospace;
         }
@@ -21,10 +24,15 @@
         .invisible {
             display: none;
         }
+        img {
+            max-width: 90vw;
+            max-height: 80vh;
+        }
     </style>
 </head>
 <body>
-    <h1>Hövding (det är jag alltså)</h1>
+    <h1>Se på fan, en Hövding!</h1>
+    <img src="https://d2q01ftr6ua4w.cloudfront.net/assets/images/8d6f885ed2e20f3cd0ed3db9fb1901da6a2695f0.jpeg">
 
     <script>
         const el = document.querySelector("h1");
