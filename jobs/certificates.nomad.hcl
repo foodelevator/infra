@@ -2,7 +2,7 @@ job "certificates" {
   type = "batch"
 
   periodic {
-    cron = "@monthly"
+    crons = ["@monthly"]
   }
 
   group "lego" {
@@ -17,7 +17,9 @@ job "certificates" {
     }
 
     network {
-      port "http" { }
+      port "http" {
+        # static = 80
+      }
     }
 
     service {
@@ -46,26 +48,23 @@ job "certificates" {
         data = <<EOF
 #!/usr/bin/env bash
 
-function dns() {
-    [ -f "/lego/certificates/$1.key" ] && cmd="renew --no-random-sleep --days 45" || cmd=run
+function cert() {
+    # --server "https://acme-staging-v02.api.letsencrypt.org/directory"
     /local/lego \
         --accept-tos \
         --path /lego \
         --email mathias+certs@magnusson.space \
-        --dns cloudflare \
-        $${@/#/-d=} \
-        $cmd
+        "$@"
+}
+
+function dns() {
+    [ -f "/lego/certificates/$1.key" ] && cmd="renew --no-random-sleep --days 45" || cmd=run
+    cert --dns cloudflare $${@/#/-d=} $cmd
 }
 
 function http() {
     [ -f "/lego/certificates/$1.key" ] && cmd="renew --no-random-sleep --days 45" || cmd=run
-    /local/lego \
-        --accept-tos \
-        --path /lego \
-        --email mathias+certs@magnusson.space \
-        --http --http.port ":$NOMAD_PORT_http" \
-        $${@/#/-d=} \
-        $cmd
+    cert --http --http.port ":$NOMAD_PORT_http" $${@/#/-d=} $cmd
 }
 
 dns magnusson.space *.magnusson.space

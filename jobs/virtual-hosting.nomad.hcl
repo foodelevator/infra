@@ -65,7 +65,9 @@ http {
     sendfile        on;
     #tcp_nopush     on;
 
-    keepalive_timeout  65;
+    client_max_body_size 500M;
+
+    keepalive_timeout 65;
 
     #gzip  on;
 
