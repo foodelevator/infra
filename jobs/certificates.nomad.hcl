@@ -74,6 +74,7 @@ dns xn--hvd-sna.ing *.xn--hvd-sna.ing
 dns xn--frskr-ira7j.ing *.xn--frskr-ira7j.ing
 dns besiktn.ing *.besiktn.ing
 http dinlugnastund.se www.dinlugnastund.se
+http transfer.zip www.transfer.zip
 CLOUDFLARE_DNS_API_TOKEN=$CTFTAJM_TOKEN dns ctftajm.se *.ctftajm.se
 EOF
         destination = "local/certs.sh"
