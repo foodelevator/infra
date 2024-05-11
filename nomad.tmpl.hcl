@@ -2,21 +2,21 @@ data_dir  = "/opt/nomad/data"
 bind_addr = "0.0.0.0"
 
 advertise {
-  http = "127.0.0.1"
-  rpc  = "127.0.0.1"
-  serf = "127.0.0.1"
+  http = "{{ ip address }}"
+  rpc  = "{{ ip address }}"
+  serf = "{{ ip address }}"
 }
 
 server {
   enabled          = true
   bootstrap_expect = 1
 
-  encrypt = "{{ .secret }}" # why not?
+  encrypt = "{{ base64 }}" # why not?
 }
 
 client {
   enabled = true
-  servers = ["127.0.0.1"]
+  servers = ["{{ ip address }}"]
 
   host_volume "ca-certificates" {
     path = "/var/local/ca-certificates"
@@ -28,10 +28,6 @@ client {
 
   host_volume "faktura-settings" {
     path = "/var/www/faktura"
-  }
-
-  host_volume "syncthing" {
-    path = "/var/local/syncthing"
   }
 
   host_volume "ctftajm-postgres" {

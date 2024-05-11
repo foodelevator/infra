@@ -18,8 +18,10 @@ job "files" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=files.magnusson.space",
-        "nginx.certname=magnusson.space",
+        "traefik.enable=true",
+        "traefik.http.routers.files.rule=Host(`files.magnusson.space`)",
+        "traefik.http.routers.files.entrypoints=https",
+        "traefik.http.routers.files.tls.certresolver=default",
       ]
     }
 

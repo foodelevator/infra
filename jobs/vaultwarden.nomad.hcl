@@ -14,8 +14,10 @@ job "vaultwarden" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=vaultwarden.magnusson.space",
-        "nginx.certname=magnusson.space",
+        "traefik.enable=true",
+        "traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.magnusson.space`)",
+        "traefik.http.routers.vaultwarden.entrypoints=https",
+        "traefik.http.routers.vaultwarden.tls.certresolver=default",
       ]
     }
 

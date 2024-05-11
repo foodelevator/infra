@@ -14,8 +14,10 @@ job "srg" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=.xn--srskildakommandorrelsegruppen-0pc88c.se",
-        "nginx.certname=xn--srskildakommandorrelsegruppen-0pc88c.se",
+        "traefik.enable=true",
+        "traefik.http.routers.srg.rule=Host(`xn--srskildakommandorrelsegruppen-0pc88c.se`)||Host(`www.xn--srskildakommandorrelsegruppen-0pc88c.se`)",
+        "traefik.http.routers.srg.entrypoints=https",
+        "traefik.http.routers.srg.tls.certresolver=default",
       ]
     }
 

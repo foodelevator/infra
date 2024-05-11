@@ -18,8 +18,10 @@ job "raytracer" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=raytracer.magnusson.space",
-        "nginx.certname=magnusson.space",
+        "traefik.enable=true",
+        "traefik.http.routers.raytracer.rule=Host(`raytracer.magnusson.space`)",
+        "traefik.http.routers.raytracer.entrypoints=https",
+        "traefik.http.routers.raytracer.tls.certresolver=default",
       ]
     }
 

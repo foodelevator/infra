@@ -14,9 +14,10 @@ job "homepage" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=.magnusson.space",
-        "nginx.certname=magnusson.space",
-        "nginx.default_server",
+        "traefik.enable=true",
+        "traefik.http.routers.homepage.rule=Host(`magnusson.space`)||Host(`www.magnusson.space`)",
+        "traefik.http.routers.homepage.entrypoints=https",
+        "traefik.http.routers.homepage.tls.certresolver=default",
       ]
     }
 

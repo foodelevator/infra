@@ -18,8 +18,10 @@ job "faeltkullen" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=xn--fltkullen-v2a.magnusson.space",
-        "nginx.certname=magnusson.space",
+        "traefik.enable=true",
+        "traefik.http.routers.faeltkullen.rule=Host(`xn--fltkullen-v2a.magnusson.space`)||Host(`www.xn--fltkullen-v2a.magnusson.space`)",
+        "traefik.http.routers.faeltkullen.entrypoints=https",
+        "traefik.http.routers.faeltkullen.tls.certresolver=default",
       ]
     }
 

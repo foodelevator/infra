@@ -18,8 +18,10 @@ job "rr" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=rr.magnusson.space",
-        "nginx.certname=magnusson.space",
+        "traefik.enable=true",
+        "traefik.http.routers.rr.rule=Host(`rr.magnusson.space`)",
+        "traefik.http.routers.rr.entrypoints=https",
+        "traefik.http.routers.rr.tls.certresolver=default",
       ]
     }
 
@@ -54,7 +56,7 @@ server {
 
   autoindex off;
   root /var/www/sites/rr;
-  index index.mp4;
+  index index.webm;
 }
 EOF
         destination = "local/website.conf"

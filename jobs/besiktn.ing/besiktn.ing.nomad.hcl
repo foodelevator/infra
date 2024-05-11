@@ -14,8 +14,10 @@ job "besiktn.ing" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=.besiktn.ing",
-        "nginx.certname=besiktn.ing",
+        "traefik.enable=true",
+        "traefik.http.routers.besiktning.rule=Host(`besiktn.ing`)||Host(`www.besiktn.ing`)",
+        "traefik.http.routers.besiktning.entrypoints=https",
+        "traefik.http.routers.besiktning.tls.certresolver=default",
       ]
     }
 

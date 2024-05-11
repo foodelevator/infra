@@ -14,8 +14,10 @@ job "försäkr.ing" {
       provider = "nomad"
 
       tags = [
-        "nginx.hostname=.xn--frskr-ira7j.ing",
-        "nginx.certname=xn--frskr-ira7j.ing",
+        "traefik.enable=true",
+        "traefik.http.routers.forsakring.rule=Host(`xn--frskr-ira7j.ing`)||Host(`www.xn--frskr-ira7j.ing`)",
+        "traefik.http.routers.forsakring.entrypoints=https",
+        "traefik.http.routers.forsakring.tls.certresolver=default",
       ]
     }
 
